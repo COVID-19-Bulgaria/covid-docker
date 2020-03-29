@@ -1,0 +1,77 @@
+version: '3.7'
+
+networks:
+  database:
+    driver: ${NETWORK_DRIVER}
+  redis:
+    driver: ${NETWORK_DRIVER}
+
+volumes:
+  covid-scraper:
+    driver: ${VOLUME_DRIVER}
+  database:
+    driver: ${VOLUME_DRIVER}
+  redis:
+    driver: ${VOLUME_DRIVER}
+
+services:
+  covid-scraper:
+    image: covid-scraper:latest
+    build:
+      context: ./applications/covid-scraper
+      args:
+        - RUBY_VERSION=${RUBY_VERSION}
+    restart: always
+    environment:
+      - COVID_SCRAPER_CODE_PATH_CONTAINER=${COVID_SCRAPER_CODE_PATH_CONTAINER}
+      - COVID_DATABASE_PATH_CONTAINER=${COVID_DATABASE_PATH_CONTAINER}
+      - REDIS_URL=${REDIS_URL}
+      - REDIS_PROVIDER=REDIS_URL
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - covid-scraper:/usr/local/bundle
+      - ${COVID_SCRAPER_CODE_PATH_HOST}:${COVID_SCRAPER_CODE_PATH_CONTAINER}
+      - ${COVID_DATABASE_PATH_HOST}:${COVID_DATABASE_PATH_CONTAINER}
+    networks:
+      - database
+      - redis
+    ports:
+      - '9292:9292'
+    depends_on:
+      - database
+      - redis
+
+  database:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGGSSENCMODE: disable
+    volumes:
+      - database:/var/lib/postgresql/data
+    networks:
+      - database
+
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - database
+    ports:
+      - '8080:8080'
+    depends_on:
+      - database
+
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - redis:/data
+    networks:
+      - redis
