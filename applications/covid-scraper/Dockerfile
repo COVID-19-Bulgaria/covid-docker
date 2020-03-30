@@ -12,6 +12,9 @@ RUN apk add --no-cache --update build-base \
                                 tzdata \
                                 postgresql-dev
 
+# Set timezone
+RUN cp /usr/share/zoneinfo/Europe/Sofia /etc/localtime
+
 # SSH Configuration
 RUN mkdir -p /root/.ssh
 ADD ssh/id_rsa /root/.ssh/id_rsa

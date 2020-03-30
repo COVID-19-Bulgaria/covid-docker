@@ -13,6 +13,7 @@ POSTGRES_PASSWORD=covid19
 POSTGRES_DB=covid19
 
 # Covid Scraper
+ENVIRONMENT=development
 RUBY_VERSION=2.7.0
 COVID_SCRAPER_CODE_PATH_HOST=/home/User/covid-scraper
 COVID_SCRAPER_CODE_PATH_CONTAINER=/usr/src/covid-scraper
