@@ -3,7 +3,10 @@ FROM r-base
 MAINTAINER Veselin Stoyanov "veselin@coronavirus-bulgaria.com"
 
 # Install Dependencies
-RUN apt-get update && apt-get install -y git libcurl4-openssl-dev libudunits2-dev libgdal-dev libgeos-dev libproj-dev libfontconfig1-dev ttf-mscorefonts-installer
+RUN sed -i -e's/ main/ main contrib/g' /etc/apt/sources.list \
+	&& apt-get update \
+	&& echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections \
+	&& apt-get install -y git libcurl4-openssl-dev libudunits2-dev libgdal-dev libgeos-dev libproj-dev libfontconfig1-dev ttf-mscorefonts-installer
 
 RUN R -e "install.packages('remotes')"
 RUN R -e "remotes::install_github('COVID-19-Bulgaria/covid-stats')"
