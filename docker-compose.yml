@@ -42,6 +42,37 @@ services:
       - database
       - redis
 
+  covid-stats:
+    image: covid-stats:latest
+    build:
+      context: ./applications/covid-stats
+    restart: "no"
+    environment:
+      - COVID_STATS_PATH_CONTAINER=${COVID_STATS_PATH_CONTAINER}
+    volumes:
+      - ${COVID_STATS_PATH_HOST}:${COVID_STATS_PATH_CONTAINER}
+    deploy:
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=35 0 * * *"
+        - "swarm.cronjob.skip-running=true"
+      replicas: 0
+      restart_policy:
+        condition: none
+
+  swarm-cronjob:
+    image: crazymax/swarm-cronjob
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "TZ=Europe/Sofia"
+      - "LOG_LEVEL=info"
+      - "LOG_JSON=false"
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
   database:
     image: postgres:alpine
     restart: always
