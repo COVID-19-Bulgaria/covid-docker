@@ -1,19 +1,18 @@
-FROM rocker/r-ubuntu:20.04
+FROM r-base
 
 MAINTAINER Veselin Stoyanov "veselin@coronavirus-bulgaria.com"
 
 # Install Dependencies
-RUN apt-get update \
+RUN sed -i -e's/ main/ main contrib/g' /etc/apt/sources.list \
+	&& apt-get update \
 	&& echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections \
 	&& apt-get install -y git libcurl4-openssl-dev libudunits2-dev libgdal-dev libgeos-dev libproj-dev libfontconfig1-dev ttf-mscorefonts-installer
 
-RUN apt-get install -y r-cran-ggplot2 r-cran-ggrepel r-cran-magrittr r-cran-stringr r-cran-stringi r-cran-rgeos r-cran-dplyr r-cran-units r-cran-curl \
-	r-cran-openssl r-cran-sf r-cran-sys r-cran-geogrid r-cran-rjson r-cran-mime r-cran-jpeg r-cran-png r-cran-httr r-cran-rnaturalearth r-cran-gridextra \
-	r-cran-imgur r-cran-isoweek r-cran-remotes
-
+RUN R -e "install.packages('remotes')"
 RUN R -e "remotes::install_github('COVID-19-Bulgaria/covid-stats')"
 
 # SSH Configuration
+RUN apt-get install -y ssh
 RUN mkdir -p /root/.ssh
 ADD ssh/id_rsa /root/.ssh/id_rsa
 ADD ssh/id_rsa.pub /root/.ssh/id_rsa.pub
