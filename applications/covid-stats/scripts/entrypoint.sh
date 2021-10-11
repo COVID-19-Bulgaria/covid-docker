@@ -1,7 +1,5 @@
 #!/bin/sh
 
-/scripts/install_dependencies.sh
-
 covid_stats
 
 git add . -A
