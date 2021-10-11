@@ -1,18 +1,16 @@
-FROM r-base
+FROM python:3-alpine
 
 MAINTAINER Veselin Stoyanov "veselin@coronavirus-bulgaria.com"
 
 # Install Dependencies
-RUN sed -i -e's/ main/ main contrib/g' /etc/apt/sources.list \
-	&& apt-get update \
-	&& echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections \
-	&& apt-get install -y git libcurl4-openssl-dev libudunits2-dev libgdal-dev libgeos-dev libproj-dev libfontconfig1-dev ttf-mscorefonts-installer
+RUN apk add --no-cache --update git \
+                                openssh \
+                                tzdata
 
-RUN R -e "install.packages('remotes')"
-RUN R -e "remotes::install_github('COVID-19-Bulgaria/covid-stats')"
+# Set timezone
+RUN cp /usr/share/zoneinfo/Europe/Sofia /etc/localtime
 
 # SSH Configuration
-RUN apt-get install -y ssh
 RUN mkdir -p /root/.ssh
 ADD ssh/id_rsa /root/.ssh/id_rsa
 ADD ssh/id_rsa.pub /root/.ssh/id_rsa.pub
@@ -27,6 +25,7 @@ RUN git config --global user.name "Deploy Bot"
 
 # Scripts
 RUN mkdir -p /scripts
+ADD scripts/install_dependencies.sh /scripts/install_dependencies.sh
 ADD scripts/entrypoint.sh /scripts/entrypoint.sh
 
 # Set working directory
