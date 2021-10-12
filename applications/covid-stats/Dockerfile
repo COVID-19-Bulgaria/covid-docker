@@ -1,11 +1,18 @@
-FROM python:3.8-alpine
+FROM python:3.8-slim-buster
 
 MAINTAINER Veselin Stoyanov "veselin@coronavirus-bulgaria.com"
 
 # Install Dependencies
-RUN apk add --no-cache --update git \
-                                openssh \
-                                tzdata
+RUN apt-get update && apt-get install -y git \
+                                         openssh-client \
+                                         tzdata \
+                                         build-essential \
+                                         gfortran \
+                                         libatlas-base-dev \
+                                         libjpeg-dev \
+                                         libxml2-dev \
+                                         libfreetype6-dev \
+                                         libpng-dev
 
 # Set timezone
 RUN cp /usr/share/zoneinfo/Europe/Sofia /etc/localtime
