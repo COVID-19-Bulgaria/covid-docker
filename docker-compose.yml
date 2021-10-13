@@ -46,6 +46,8 @@ services:
     image: covid-stats:latest
     build:
       context: ./applications/covid-stats
+      args:
+        - MAKEFLAGS=${BUILD_MAKEFLAGS}
     restart: "no"
     environment:
       - COVID_STATS_PATH_CONTAINER=${COVID_STATS_PATH_CONTAINER}

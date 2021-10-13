@@ -1,6 +1,9 @@
 # Define the prefix of container names
 COMPOSE_PROJECT_NAME=covid19-bulgaria
 
+# Build
+BUILD_MAKEFLAGS=-j1
+
 # Networks driver to be used
 NETWORK_DRIVER=bridge
 
