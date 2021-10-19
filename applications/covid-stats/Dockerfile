@@ -50,6 +50,9 @@ ADD scripts/entrypoint.sh /scripts/entrypoint.sh
 ENV COVID_STATS_PATH_CONTAINER /usr/src/covid-stats
 WORKDIR $COVID_STATS_PATH_CONTAINER
 
+# Invalidate Docker image layer caches
+ADD https://api.github.com/repos/COVID-19-Bulgaria/covid-stats/git/refs/heads/master /tmp/version.json
+
 RUN pip install --no-cache-dir git+https://github.com/COVID-19-Bulgaria/covid-stats.git@master
 
 ENTRYPOINT ["/scripts/entrypoint.sh"]
